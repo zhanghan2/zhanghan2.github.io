@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>hello,world</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="C++,Algorithm,Rookie">
+<meta property="og:type" content="website">
+<meta property="og:title" content="hello,world">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;index.html">
+<meta property="og:site_name" content="hello,world">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="hello,world" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">hello,world</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-集合栈计算机" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/05/%E9%9B%86%E5%90%88%E6%A0%88%E8%AE%A1%E7%AE%97%E6%9C%BA/" class="article-date">
+  <time datetime="2019-12-05T06:42:48.000Z" itemprop="datePublished">2019-12-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/12/05/%E9%9B%86%E5%90%88%E6%A0%88%E8%AE%A1%E7%AE%97%E6%9C%BA/">集合栈计算机</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>题目：<a href="https://vjudge.net/problem/UVA-12096" target="_blank" rel="noopener">https://vjudge.net/problem/UVA-12096</a></p>
+<p>【分析】：(算法竞赛入门经典第二版P116)<br>    本题的集合实际是集合的集合，每个集合都有唯一的ID,因此任意一个集合通过包含多个ID可以让多个其他集合成为它的内部元素。<br>    集合类型：<code>set&lt;int&gt;</code> ID类型：<code>int</code></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+#include &lt;stack&gt;
+#include &lt;fstream&gt;
+using namespace std;
+
+typedef set&lt;int&gt; Set; 
+vector&lt;Set&gt; v; //存储各个集合，并为其分配ID
+map&lt;Set,int&gt; my_map; //集合与对应的ID做映射，根据ID取集合
+stack&lt;int&gt; st; //st中为集合的ID
+
+int get_ID(Set x)
+{
+    if(my_map.count(x))  return my_map[x];
+    v.push_back(x);
+    my_map[x] = v.size()-1;
+    return v.size()-1;
+}
+
+void my_set_add(Set&amp; s,Set&amp; s1,Set&amp; s2)
+{
+    s = s2;
+    s.insert(my_map[s1]);
+    int id = get_ID(s);
+    st.push(id);
+}
+void my_set_intersection(Set&amp; s,Set&amp; s1,Set&amp; s2)
+{
+    auto s1_begin = s1.begin(), s1_end = s1.end();
+    auto s2_begin = s2.begin(), s2_end = s2.end();
+    if(s1.empty() || s2.empty()) {s = Set(); int id = get_ID(s); st.push(id); return;}
+    vector&lt;int&gt; temp(int(s1.size())+int(s2.size()));
+    set_intersection(s1_begin,s1_end,s2_begin,s2_end,temp.begin());
+    s = set&lt;int&gt;(temp.begin(),temp.end());
+    int id = get_ID(s);
+    st.push(id);
+}
+void my_set_union(Set&amp; s,Set&amp; s1,Set&amp; s2)
+{
+    auto s1_begin = s1.begin(), s1_end = s1.end();
+    auto s2_begin = s2.begin(), s2_end = s2.end();
+    vector&lt;int&gt; temp(int(s1.size())+int(s2.size()));
+    set_union(s1_begin,s1_end,s2_begin,s2_end,temp.begin());
+    s = set&lt;int&gt;(temp.begin(),temp.end());
+    int id = get_ID(s);
+    st.push(id);
+}
+
+int main()
+{
+    //将输出重定向到文件里便于检查
+    // fstream fs;
+    // fs.open(&quot;test.txt&quot;,ios::out);
+
+    int n;
+    cin &gt;&gt; n;
+    for(int i = 0; i &lt; n; i++)
+    {
+        int num;
+        cin &gt;&gt; num;
+        for(int j = 0; j &lt; num; j++)
+        {
+            string cmd; cin &gt;&gt; cmd;
+            if(cmd[0] == &apos;P&apos;) st.push(get_ID(Set()));
+            else if(cmd[0] == &apos;D&apos;) st.push(st.top());
+            else
+            {
+                Set s1 = v[st.top()]; st.pop();
+                Set s2 = v[st.top()]; st.pop();
+                Set s;
+                if(cmd[0] == &apos;U&apos;) my_set_union(s,s1,s2);
+                if(cmd[0] == &apos;I&apos;) my_set_intersection(s,s1,s2);
+                if(cmd[0] == &apos;A&apos;) my_set_add(s,s1,s2);
+            }
+            //fs &lt;&lt; v[st.top()].size() &lt;&lt; endl;
+            cout &lt;&lt; v[st.top()].size() &lt;&lt; endl;
+        }
+        //fs &lt;&lt; &quot;***&quot; &lt;&lt; endl;
+        cout &lt;&lt; &quot;***&quot; &lt;&lt; endl;
+    }
+    system(&quot;pause&quot;);
+    //fs.close();
+    return 0;
+}</code></pre><p>值得一提的是学习了<code>set</code>中求并集和交集的两个函数，<code>set_union</code>与<code>set_intersection</code>，函数定义见<a href="http://www.cplusplus.com/reference/algorithm/set_union/，http://www.cplusplus.com/reference/algorithm/set_intersection/。" target="_blank" rel="noopener">http://www.cplusplus.com/reference/algorithm/set_union/，http://www.cplusplus.com/reference/algorithm/set_intersection/。</a><br>函数的前4个参数为两个<code>set</code>的起始地址、结束地址，最后一个参数为保存结果的地址。<br>踩过的坑：保存结果的地址必须<strong>已分配</strong>。例如将结果保存在<code>vector</code>中，<code>vector</code>地址需要事先分配。</p>
+<p>收获：<br>    1.嵌套的思想(集合的集合)<br>    2.<code>set</code>中并集交集函数的学习<br>    3.<code>fstream</code>的使用，通过将输出写到文件里，便于oj上题目的调试</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/05/%E9%9B%86%E5%90%88%E6%A0%88%E8%AE%A1%E7%AE%97%E6%9C%BA/" data-id="ck3sf9q240000v0or1oi0eonj" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/05/%E9%9B%86%E5%90%88%E6%A0%88%E8%AE%A1%E7%AE%97%E6%9C%BA/">集合栈计算机</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 zhh<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
